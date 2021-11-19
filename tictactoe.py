@@ -29,21 +29,51 @@ class TicTacToe:
 
     def check_win(self, player):
         # 0 for draw, 1 for X win, -1 for O win
-        row_offset = self.rows - self.streak
-        col_offset = self.columns - self.streak
+        row_offset = self.rows - self.streak + 1
+        col_offset = self.columns - self.streak + 1
 
         # horizontal
         for row in range(self.rows):
-            for offset in range(col_offset):
-                if self.columns - offset < self.streak:
-                    break
+            for start_col in range(col_offset):
                 current_streak = 0
-                for col in range(offset, ):
-                    if self.board[row][col+offset] == player:
+                for col in range(start_col, start_col+self.streak):
+                    if self.board[row][col] == player:
+                        current_streak +=1
+                    if current_streak == self.streak:
+                        return True
+
+        # vertical
+        for col in range(self.columns):
+            for start_row in range(row_offset):
+                current_streak = 0
+                for row in range(start_row, start_row+self.streak):
+                    if self.board[row][col] == player:
+                        current_streak +=1
+                    if current_streak == self.streak:
+                        return True
+
+        # left to right diagonal
+        for start_row in range(row_offset):
+            for start_col in range(col_offset):
+                current_streak = 0
+                for offset in range(0, self.streak):
+                    if self.board[start_row+offset][start_col+offset] == player:
                         current_streak += 1
                     if current_streak == self.streak:
                         return True
-        pass
+
+        # right to left diagonal
+        for start_row in range(row_offset):
+            for rigth_offset in range(col_offset):
+                start_col = self.columns - rigth_offset -1
+                current_streak = 0
+                for offset in range(0, self.streak):
+                    if self.board[start_row+offset][start_col-offset] == player:
+                        current_streak += 1
+                    if current_streak == self.streak:
+                        return True
+
+        return False
 
     def generate_heuristic_table(self):
         heuristic_table = np.zeros((self.rows, self.colums))

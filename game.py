@@ -1,40 +1,14 @@
 import pygame as pg
+import argparse
 import sys
+import json
 from tictactoe import TicTacToe
-from themes import *
 
 
-class Player():
-    def __init__(self, max_player):
-        if max_player:
-            self.value = 1
-        else:
-            self.value = -1
-
-    def make_move(self):
-        pass
-
-class MinimaxPlayer(Player):
-    def __init__(self, max_player, depth, pruning=True):
-        super().__init__(max_player)
-        self.depth = depth
-        self.pruning = pruning
-
-    '''
-    minimax(board):
-        get a hold of empty squares array and current board
-        for square in board.empty_squares:
-            board.mark_square(square)
-            if check_win():
-                value =  player * (len(empty_squares) + 1)
-            else:
-                value = minimax(board)
-
-    '''
-
-def create_screen(rows, columns, square_size, line_width, foreground_color, background_color):
+def create_screen(rows, columns, square_size, foreground_color, background_color):
     width = square_size * columns
     height = square_size * rows
+    line_width = int(square_size * 0.1)
 
     screen = pg.display.set_mode((width, height))
     pg.display.set_caption('Tic Tac Toe')
@@ -47,7 +21,6 @@ def create_screen(rows, columns, square_size, line_width, foreground_color, back
         pg.draw.line(screen, foreground_color, (0, square_size*i), (width, square_size*i), line_width)
 
     return screen
-
 
 def draw_figures(screen, board, square_size, circle_color, cross_color):
     circe_radius = int(square_size * 0.4)
@@ -77,20 +50,37 @@ def draw_figures(screen, board, square_size, circle_color, cross_color):
                                (int(col * square_size + square_size * 0.5), int(row * square_size + square_size * 0.5)),
                                circe_radius, edge_width)
 
+def draw_game_over_message(screen, square_size):
+    pass
 
-def main():
+# [228, 164, 88]
+def main(arguments):
 
-    # foreground_color = (68, 52, 79)
-    # background_color = (153, 154, 198)
-    # x_color = (39, 208, 193)
-    # o_color = (164, 247, 38)
-    foreground_color, background_color, x_color, o_color = DUNE
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--theme')
+    args = parser.parse_args(arguments[1:])
+
+    with open('themes.json') as fh:
+        themes = json.load(fh)
+
+    if args.theme:
+        foreground_color = themes[args.theme][0]['foreground_color']
+        background_color = themes[args.theme][0]['background_color']
+        x_color = themes[args.theme][0]['x_color']
+        o_color = themes[args.theme][0]['o_color']
+    else:
+        foreground_color = themes['classic'][0]['foreground_color']
+        background_color = themes['classic'][0]['background_color']
+        x_color = themes['classic'][0]['x_color']
+        o_color = themes['classic'][0]['o_color']
+
     pg.init()
-    rows = 4
+    rows = 5
     columns = 5
+    streak = 4
     square_size = 120
-    ttt= TicTacToe(rows, columns, 4)
-    screen = create_screen(rows, columns, square_size, 12, foreground_color, background_color)
+    ttt= TicTacToe(rows, columns, streak)
+    screen = create_screen(rows, columns, square_size, foreground_color, background_color)
 
     player = 1 # 1 is X, -1 is O
     while True:
@@ -114,14 +104,14 @@ def main():
                 else:
                     print('square full')
 
+                if len(ttt.empty_squares()) == 0:
+                    print('draw')
 
         draw_figures(screen, ttt.board, square_size, o_color, x_color)
+
 
         pg.display.update()
 
 
-
-
-
 if __name__=="__main__":
-    main()
+    main(sys.argv)
