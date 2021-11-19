@@ -22,5 +22,21 @@
             "x_color": [110, 184, 61],
             "o_color": [133, 239, 255]
         }
+    ],
+    "joy": [
+        {
+            "foreground_color": [56, 22, 59],
+            "background_color": [138, 73, 151],
+            "x_color": [39, 43, 145],
+            "o_color": [207, 38, 176]
+        }
+    ],
+    "2049": [
+        {
+            "foreground_color": [179, 78, 0],
+            "background_color": [235, 189, 132],
+            "x_color": [108, 91, 58],
+            "o_color": [192, 131, 84]
+        }
     ]
 }

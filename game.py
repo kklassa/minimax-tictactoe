@@ -1,44 +1,9 @@
 import pygame as pg
+import argparse
 import sys
 import json
-import argparse
 from tictactoe import TicTacToe
 
-
-class Player():
-    def __init__(self, max_player):
-        if max_player:
-            self.value = 1
-        else:
-            self.value = -1
-
-    def make_move(self):
-        pass
-
-class MinimaxPlayer(Player):
-    def __init__(self, max_player, depth, pruning=True):
-        super().__init__(max_player)
-        self.depth = depth
-        self.pruning = pruning
-        self.best_move = None
-
-    def make_move(self, game_state):
-        self.minimax(game_state)
-        return self.best_move
-
-    def minimax(game_state):
-        pass
-    '''
-    minimax(board):
-        get a hold of empty squares array and current board
-        for square in board.empty_squares:
-            board.mark_square(square)
-            if check_win():
-                value =  player * (len(empty_squares) + 1)
-            else:
-                value = minimax(board)
-
-    '''
 
 def create_screen(rows, columns, square_size, foreground_color, background_color):
     width = square_size * columns
@@ -56,7 +21,6 @@ def create_screen(rows, columns, square_size, foreground_color, background_color
         pg.draw.line(screen, foreground_color, (0, square_size*i), (width, square_size*i), line_width)
 
     return screen
-
 
 def draw_figures(screen, board, square_size, circle_color, cross_color):
     circe_radius = int(square_size * 0.4)
@@ -86,7 +50,10 @@ def draw_figures(screen, board, square_size, circle_color, cross_color):
                                (int(col * square_size + square_size * 0.5), int(row * square_size + square_size * 0.5)),
                                circe_radius, edge_width)
 
+def draw_game_over_message(screen, square_size):
+    pass
 
+# [228, 164, 88]
 def main(arguments):
 
     parser = argparse.ArgumentParser()
@@ -108,9 +75,9 @@ def main(arguments):
         o_color = themes['classic'][0]['o_color']
 
     pg.init()
-    rows = 7
-    columns = 9
-    streak = 6
+    rows = 5
+    columns = 5
+    streak = 4
     square_size = 120
     ttt= TicTacToe(rows, columns, streak)
     screen = create_screen(rows, columns, square_size, foreground_color, background_color)
@@ -137,13 +104,13 @@ def main(arguments):
                 else:
                     print('square full')
 
+                if len(ttt.empty_squares()) == 0:
+                    print('draw')
 
         draw_figures(screen, ttt.board, square_size, o_color, x_color)
 
+
         pg.display.update()
-
-
-
 
 
 if __name__=="__main__":
