@@ -3,7 +3,6 @@ import sys
 import json
 import argparse
 from tictactoe import TicTacToe
-from themes import *
 
 
 class Player():
@@ -41,9 +40,10 @@ class MinimaxPlayer(Player):
 
     '''
 
-def create_screen(rows, columns, square_size, line_width, foreground_color, background_color):
+def create_screen(rows, columns, square_size, foreground_color, background_color):
     width = square_size * columns
     height = square_size * rows
+    line_width = int(square_size * 0.1)
 
     screen = pg.display.set_mode((width, height))
     pg.display.set_caption('Tic Tac Toe')
@@ -106,12 +106,14 @@ def main(arguments):
         background_color = themes['classic'][0]['background_color']
         x_color = themes['classic'][0]['x_color']
         o_color = themes['classic'][0]['o_color']
+
     pg.init()
-    rows = 4
+    rows = 5
     columns = 5
+    streak = 4
     square_size = 120
-    ttt= TicTacToe(rows, columns, 4)
-    screen = create_screen(rows, columns, square_size, 12, foreground_color, background_color)
+    ttt= TicTacToe(rows, columns, streak)
+    screen = create_screen(rows, columns, square_size, foreground_color, background_color)
 
     player = 1 # 1 is X, -1 is O
     while True:
