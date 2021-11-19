@@ -108,9 +108,9 @@ def main(arguments):
         o_color = themes['classic'][0]['o_color']
 
     pg.init()
-    rows = 5
-    columns = 5
-    streak = 4
+    rows = 7
+    columns = 9
+    streak = 6
     square_size = 120
     ttt= TicTacToe(rows, columns, streak)
     screen = create_screen(rows, columns, square_size, foreground_color, background_color)

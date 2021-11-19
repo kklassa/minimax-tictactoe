@@ -33,3 +33,16 @@ def test_check_win_vertical_696():
     ttt = TicTacToe(6, 9, 6)
     for row in range(0, 6):
         ttt.mark_square(row, 7, 1)
+    assert ttt.check_win(1) == True
+
+def test_check_win_left_to_right_diagonal_997():
+    ttt = TicTacToe(9, 9, 7)
+    for offset in range(0, 8):
+        ttt.mark_square(offset, offset, -1)
+    assert ttt.check_win(-1) == True
+
+def test_check_win_right_to_left_diagonal_585():
+    ttt = TicTacToe(5, 8, 5)
+    for offset in range(0, 5):
+        ttt.mark_square(offset, 5-offset, 1)
+    assert ttt.check_win(1) == True

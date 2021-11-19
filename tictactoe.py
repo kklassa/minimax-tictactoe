@@ -52,6 +52,26 @@ class TicTacToe:
                     if current_streak == self.streak:
                         return True
 
+        # left to right diagonal
+        for start_row in range(row_offset):
+            for start_col in range(col_offset):
+                current_streak = 0
+                for offset in range(0, self.streak):
+                    if self.board[start_row+offset][start_col+offset] == player:
+                        current_streak += 1
+                    if current_streak == self.streak:
+                        return True
+
+        # right to left diagonal
+        for start_row in range(row_offset):
+            for rigth_offset in range(col_offset):
+                start_col = self.columns - rigth_offset -1
+                current_streak = 0
+                for offset in range(0, self.streak):
+                    if self.board[start_row+offset][start_col-offset] == player:
+                        current_streak += 1
+                    if current_streak == self.streak:
+                        return True
 
         return False
 
