@@ -2,7 +2,9 @@ import pygame as pg
 import argparse
 import sys
 import json
+from time import sleep
 from tictactoe import TicTacToe
+from players import HumanPlayer, Player, RandomPlayer
 
 
 def create_screen(rows, columns, square_size, foreground_color, background_color):
@@ -50,10 +52,6 @@ def draw_figures(screen, board, square_size, circle_color, cross_color):
                                (int(col * square_size + square_size * 0.5), int(row * square_size + square_size * 0.5)),
                                circe_radius, edge_width)
 
-def draw_game_over_message(screen, square_size):
-    pass
-
-# [228, 164, 88]
 def main(arguments):
 
     parser = argparse.ArgumentParser()
@@ -82,35 +80,55 @@ def main(arguments):
     ttt= TicTacToe(rows, columns, streak)
     screen = create_screen(rows, columns, square_size, foreground_color, background_color)
 
-    player = 1 # 1 is X, -1 is O
-    while True:
+
+    max_player = HumanPlayer(True)
+    min_player = RandomPlayer(False)
+    turn = 0
+    current_player = None
+    game_over = False
+    while not game_over:
+        current_player = max_player if turn%2 == 0 else min_player
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 sys.exit()
 
-            if event.type == pg.MOUSEBUTTONDOWN:
-                mouse_x = event.pos[0] # x
-                mouse_y = event.pos[1] # Y
+            if current_player.type == 'human':
 
-                clicked_row = int(mouse_y // square_size)
-                clicked_col = int(mouse_x // square_size)
+                if event.type == pg.MOUSEBUTTONDOWN:
+                    mouse_x = event.pos[0] # x
+                    mouse_y = event.pos[1] # Y
 
-                if ttt.square_empty(clicked_row, clicked_col):
-                    ttt.mark_square(clicked_row, clicked_col, player)
-                    if ttt.check_win(player):
-                        winner = 'X' if player == 1 else 'O'
-                        print(f'{winner} won')
-                    player = - player
-                else:
-                    print('square full')
+                    clicked_row = int(mouse_y // square_size)
+                    clicked_col = int(mouse_x // square_size)
 
-                if len(ttt.empty_squares()) == 0:
-                    print('draw')
+                    if ttt.square_empty(clicked_row, clicked_col):
+                        ttt.mark_square(clicked_row, clicked_col, current_player.value)
+                        if ttt.check_win(current_player.value):
+                            winner = 'X' if current_player.value == 1 else 'O'
+                            print(f'{winner} won')
+                            game_over = True
+                        turn += 1
+                    else:
+                        print('square full')
+
+        if len(ttt.empty_squares()) == 0:
+            print('draw')
+            game_over = True
+        elif  current_player.type != 'human':
+            sleep(0.5)
+            row, col = current_player.make_move(ttt)
+            ttt.mark_square(row, col, current_player.value)
+            if ttt.check_win(current_player.value):
+                winner = 'X' if current_player.value == 1 else 'O'
+                print(f'{winner} won')
+                game_over = True
+            turn += 1
 
         draw_figures(screen, ttt.board, square_size, o_color, x_color)
-
-
         pg.display.update()
+
+        if game_over:
+            sleep(5)
 
 
 if __name__=="__main__":
