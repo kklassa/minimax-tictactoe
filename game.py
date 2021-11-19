@@ -1,5 +1,7 @@
 import pygame as pg
 import sys
+import json
+import argparse
 from tictactoe import TicTacToe
 from themes import *
 
@@ -19,7 +21,14 @@ class MinimaxPlayer(Player):
         super().__init__(max_player)
         self.depth = depth
         self.pruning = pruning
+        self.best_move = None
 
+    def make_move(self, game_state):
+        self.minimax(game_state)
+        return self.best_move
+
+    def minimax(game_state):
+        pass
     '''
     minimax(board):
         get a hold of empty squares array and current board
@@ -78,13 +87,25 @@ def draw_figures(screen, board, square_size, circle_color, cross_color):
                                circe_radius, edge_width)
 
 
-def main():
+def main(arguments):
 
-    # foreground_color = (68, 52, 79)
-    # background_color = (153, 154, 198)
-    # x_color = (39, 208, 193)
-    # o_color = (164, 247, 38)
-    foreground_color, background_color, x_color, o_color = DUNE
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--theme')
+    args = parser.parse_args(arguments[1:])
+
+    with open('themes.json') as fh:
+        themes = json.load(fh)
+
+    if args.theme:
+        foreground_color = themes[args.theme][0]['foreground_color']
+        background_color = themes[args.theme][0]['background_color']
+        x_color = themes[args.theme][0]['x_color']
+        o_color = themes[args.theme][0]['o_color']
+    else:
+        foreground_color = themes['classic'][0]['foreground_color']
+        background_color = themes['classic'][0]['background_color']
+        x_color = themes['classic'][0]['x_color']
+        o_color = themes['classic'][0]['o_color']
     pg.init()
     rows = 4
     columns = 5
@@ -124,4 +145,4 @@ def main():
 
 
 if __name__=="__main__":
-    main()
+    main(sys.argv)

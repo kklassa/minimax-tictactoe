@@ -1,0 +1,26 @@
+{
+    "classic": [
+        {
+            "foreground_color": [0, 0, 0],
+            "background_color": [255, 255, 255],
+            "x_color": [255, 0, 0],
+            "o_color": [0, 0, 255]
+        }
+    ],
+    "alien": [
+        {
+            "foreground_color": [68, 52, 79],
+            "background_color": [153, 154, 198],
+            "x_color": [39, 208, 193],
+            "o_color": [164, 247, 38]
+        }
+    ],
+    "dune": [
+        {
+            "foreground_color": [185, 100, 100],
+            "background_color": [243, 192, 145],
+            "x_color": [110, 184, 61],
+            "o_color": [133, 239, 255]
+        }
+    ]
+}
