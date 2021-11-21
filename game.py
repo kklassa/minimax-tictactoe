@@ -4,27 +4,27 @@ import sys
 import json
 from time import sleep
 from tictactoe import TicTacToe
-from players import HumanPlayer, Player, RandomPlayer
+from players import Player, HumanPlayer, RandomPlayer, MinimaxPlayer
 
 
-def create_screen(rows, columns, square_size, foreground_color, background_color):
+def create_screen(rows, columns, square_size, color_theme):
     width = square_size * columns
     height = square_size * rows
     line_width = int(square_size * 0.1)
 
     screen = pg.display.set_mode((width, height))
     pg.display.set_caption('Tic Tac Toe')
-    screen.fill(background_color)
+    screen.fill(color_theme['background_color'])
 
     for i in range(1, columns):
-        pg.draw.line(screen, foreground_color, (square_size*i,0), (square_size*i, height), line_width)
+        pg.draw.line(screen, color_theme['foreground_color'], (square_size*i,0), (square_size*i, height), line_width)
 
     for i in range(1, rows):
-        pg.draw.line(screen, foreground_color, (0, square_size*i), (width, square_size*i), line_width)
+        pg.draw.line(screen, color_theme['foreground_color'], (0, square_size*i), (width, square_size*i), line_width)
 
     return screen
 
-def draw_figures(screen, board, square_size, circle_color, cross_color):
+def draw_figures(screen, board, square_size, color_theme):
     circe_radius = int(square_size * 0.4)
     edge_width = int(square_size * 0.1)
     cross_offset_1 = int(square_size * 0.24)
@@ -39,18 +39,36 @@ def draw_figures(screen, board, square_size, circle_color, cross_color):
                     (col * square_size + square_size - cross_offset_1, row * square_size + square_size - cross_offset_2),
                     (col * square_size + square_size - cross_offset_2, row * square_size + square_size - cross_offset_1)
                 ]
-                pg.draw.polygon(screen, cross_color, points)
+                pg.draw.polygon(screen, color_theme['x_color'], points)
                 points = [
                     (col * square_size + square_size - cross_offset_1, row * square_size + cross_offset_2),
                     (col * square_size + square_size - cross_offset_2, row * square_size + cross_offset_1),
                     (col * square_size + cross_offset_1, row * square_size + square_size - cross_offset_2),
                     (col * square_size + cross_offset_2, row * square_size + square_size - cross_offset_1)
                 ]
-                pg.draw.polygon(screen, cross_color, points)
+                pg.draw.polygon(screen, color_theme['x_color'], points)
             elif board[row][col] == -1:
-                pg.draw.circle(screen, circle_color,
+                pg.draw.circle(screen, color_theme['o_color'],
                                (int(col * square_size + square_size * 0.5), int(row * square_size + square_size * 0.5)),
                                circe_radius, edge_width)
+
+
+def set_color_theme(args):
+    with open('themes.json') as fh:
+        themes = json.load(fh)
+
+    if args.theme:
+        color_theme = themes[args.theme][0]
+    else:
+        color_theme = themes['classic'][0]
+
+    return color_theme
+
+def draw_game_over_message(screen, square_size):
+    pass
+
+def game_loop(game: TicTacToe, max_player: Player, min_player: Player, screen = None):
+    pass
 
 def main(arguments):
 
@@ -58,30 +76,18 @@ def main(arguments):
     parser.add_argument('--theme')
     args = parser.parse_args(arguments[1:])
 
-    with open('themes.json') as fh:
-        themes = json.load(fh)
-
-    if args.theme:
-        foreground_color = themes[args.theme][0]['foreground_color']
-        background_color = themes[args.theme][0]['background_color']
-        x_color = themes[args.theme][0]['x_color']
-        o_color = themes[args.theme][0]['o_color']
-    else:
-        foreground_color = themes['classic'][0]['foreground_color']
-        background_color = themes['classic'][0]['background_color']
-        x_color = themes['classic'][0]['x_color']
-        o_color = themes['classic'][0]['o_color']
+    color_theme = set_color_theme(args)
 
     pg.init()
-    rows = 5
-    columns = 5
-    streak = 4
+    rows = 7
+    columns = 7
+    streak = 5
     square_size = 120
     ttt= TicTacToe(rows, columns, streak)
-    screen = create_screen(rows, columns, square_size, foreground_color, background_color)
+    screen = create_screen(rows, columns, square_size, color_theme)
 
 
-    max_player = HumanPlayer(True)
+    max_player = MinimaxPlayer(True, 2, False)
     min_player = RandomPlayer(False)
     turn = 0
     current_player = None
@@ -105,7 +111,7 @@ def main(arguments):
                         ttt.mark_square(clicked_row, clicked_col, current_player.value)
                         if ttt.check_win(current_player.value):
                             winner = 'X' if current_player.value == 1 else 'O'
-                            print(f'{winner} won')
+                            print(f'{winner} won in turn nr {turn+1}')
                             game_over = True
                         turn += 1
                     else:
@@ -120,14 +126,16 @@ def main(arguments):
             ttt.mark_square(row, col, current_player.value)
             if ttt.check_win(current_player.value):
                 winner = 'X' if current_player.value == 1 else 'O'
-                print(f'{winner} won')
+                print(f'{winner} won in turn nr {turn+1}')
                 game_over = True
             turn += 1
+            # print(f'current win heuristic: {ttt.empty_squares_heuristic(current_player.value)}')
 
-        draw_figures(screen, ttt.board, square_size, o_color, x_color)
+        draw_figures(screen, ttt.board, square_size, color_theme)
         pg.display.update()
 
         if game_over:
+            print(f'current win heuristic: {ttt.empty_squares_heuristic(current_player.value)}')
             sleep(5)
 
 
