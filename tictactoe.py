@@ -2,21 +2,21 @@ import numpy as np
 
 
 class TicTacToe:
-    def __init__(self, rows, columns, streak_to_win):
+    def __init__(self, rows: int, columns: int, streak_to_win: int):
         self.rows= rows
         self.columns = columns
         self.board = np.zeros((rows, columns))
         self.streak = streak_to_win
 
-    def square_empty(self, row, col):
+    def square_empty(self, row: int, col: int):
         if self.board[row][col] == 0:
             return True
         return False
 
-    def mark_square(self, row, col, player):
+    def mark_square(self, row: int, col: int, player: int):
         self.board[row][col] = player
 
-    def clear_square(self, row, col):
+    def clear_square(self, row: int, col: int):
         self.board[row][col] = 0
 
     def empty_squares(self):
@@ -27,7 +27,7 @@ class TicTacToe:
                     empty_positions.append([row, col])
         return empty_positions
 
-    def check_win(self, player):
+    def check_win(self, player: int):
         # 0 for draw, 1 for X win, -1 for O win
         row_offset = self.rows - self.streak + 1
         col_offset = self.columns - self.streak + 1
@@ -77,3 +77,6 @@ class TicTacToe:
 
     def generate_heuristic_table(self):
         heuristic_table = np.zeros((self.rows, self.colums))
+
+    def empty_squares_heuristic(self, player: int):
+        return player * (len(self.empty_squares()) + 1)
