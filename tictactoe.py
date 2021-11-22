@@ -7,6 +7,7 @@ class TicTacToe:
         self.columns = columns
         self.board = np.zeros((rows, columns))
         self.streak = streak_to_win
+        self.heuristic_table = self.generate_heuristic_table()
 
     def square_empty(self, row: int, col: int):
         if self.board[row][col] == 0:
@@ -76,7 +77,55 @@ class TicTacToe:
         return False
 
     def generate_heuristic_table(self):
-        heuristic_table = np.zeros((self.rows, self.colums))
+        heuristic_table = np.zeros((self.rows, self.columns))
+        row_offset = self.rows - self.streak + 1
+        col_offset = self.columns - self.streak + 1
+
+        # horizontal
+        for row in range(self.rows):
+            for start_col in range(col_offset):
+                for col in range(start_col, start_col+self.streak):
+                    heuristic_table[row][col] += 1
+
+
+        # vertical
+        for col in range(self.columns):
+            for start_row in range(row_offset):
+                for row in range(start_row, start_row+self.streak):
+                    heuristic_table[row][col] += 1
+
+
+        # left to right diagonal
+        for start_row in range(row_offset):
+            for start_col in range(col_offset):
+                for offset in range(0, self.streak):
+                    heuristic_table[start_row+offset][start_col+offset] +=1
+
+
+        # right to left diagonal
+        for start_row in range(row_offset):
+            for rigth_offset in range(col_offset):
+                start_col = self.columns - rigth_offset -1
+                for offset in range(0, self.streak):
+                    heuristic_table[start_row+offset][start_col-offset] += 1
+
+
+        return heuristic_table
 
     def empty_squares_heuristic(self, player: int):
         return player * (len(self.empty_squares()) + 1)
+
+    def compare(self, game_state):
+        different_squares = []
+        for row in range(self.rows):
+            for col in range(self.columns):
+                if self.board[row][col] != game_state.board[row][col]:
+                    different_squares.append([row, col])
+        return different_squares
+
+    def table_heuristic(self):
+        score = 0
+        for row in range(self.rows):
+            for col in range(self.columns):
+                score += self.board[row][col] * self.heuristic_table[row][col]
+        return score
