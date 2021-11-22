@@ -1,7 +1,6 @@
 import pygame as pg
 import argparse
 import sys
-import json
 from time import sleep
 from tictactoe import TicTacToe
 from players import Player, HumanPlayer, RandomPlayer, MinimaxPlayer
@@ -41,7 +40,10 @@ def game_loop(game: TicTacToe, max_player: Player, min_player: Player, ui: UI):
             print('draw')
             game_over = True
         elif  current_player.type != 'human':
+            print(game.board)
+            print(f'current score evaluation: {game.table_heuristic()}')
             sleep(0.5)
+            # print(f' Player {current_player.value} moves')
             row, col = current_player.make_move(game)
             game.mark_square(row, col, current_player.value)
             if game.check_win(current_player.value):
@@ -54,8 +56,9 @@ def game_loop(game: TicTacToe, max_player: Player, min_player: Player, ui: UI):
         pg.display.update()
 
         if game_over:
-            print(f'current win heuristic: {game.empty_squares_heuristic(current_player.value)}')
-            sleep(5)
+            sleep(3)
+
+    return current_player, turn
 
 
 def main(arguments):
@@ -64,19 +67,19 @@ def main(arguments):
     parser.add_argument('--theme')
     args = parser.parse_args(arguments[1:])
 
-    rows = 5
-    columns = 5
-    streak = 4
+    rows = 3
+    columns = 3
+    streak = 3
     square_size = 120
     ttt= TicTacToe(rows, columns, streak)
-
     pg.init()
     ui = UI(rows, columns, square_size)
     ui.set_color_theme(args.theme)
     ui.create_screen()
 
-    max_player = MinimaxPlayer(True, 3, False)
-    min_player = MinimaxPlayer(False, 4, False)
+    #max_player = HumanPlayer(True)
+    max_player = MinimaxPlayer(True, 9, False)
+    min_player = MinimaxPlayer(False, 9, False)
 
     game_loop(ttt, max_player, min_player, ui)
 

@@ -20,6 +20,7 @@ class UI:
         else:
             self.color_theme =themes['classic'][0]
 
+
     def draw_lines(self, width, height):
         line_width = int(self.square_size * 0.1)
         for i in range(1, self.columns):
@@ -28,11 +29,19 @@ class UI:
         for i in range(1, self.rows):
             pg.draw.line(self.screen, self.color_theme['foreground_color'], (0, self.square_size*i), (width, self.square_size*i), line_width)
 
+
     def create_screen(self):
         width = self.square_size * self.columns
         height = self.square_size * self.rows
         self.screen = pg.display.set_mode((width, height))
         pg.display.set_caption('Tic Tac Toe')
+        self.screen.fill(self.color_theme['background_color'])
+        self.draw_lines(width, height)
+
+
+    def reset(self):
+        width = self.square_size * self.columns
+        height = self.square_size * self.rows
         self.screen.fill(self.color_theme['background_color'])
         self.draw_lines(width, height)
 

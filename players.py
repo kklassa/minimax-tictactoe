@@ -46,16 +46,20 @@ class MinimaxPlayer(Player):
         self.states = {}
         self.minimax(game_state, self.depth, self.max_player)
         if self.max_player:
+            # print(self.states)
             row, column = max(self.states, key = self.states.get)
         else:
+            # print(self.states)
             row, column = min(self.states, key = self.states.get)
         return row, column
 
     def minimax(self, game_state: TicTacToe, depth, max_player):
         game_state = deepcopy(game_state)
         self.states_explored += 1
-        if game_state.check_win(self.value) or depth == 0:
+        player = 1 if max_player else -1
+        if depth == 0 or game_state.check_win(self.value):
             return game_state.empty_squares_heuristic(self.value)
+
 
         if max_player:
             max_evaluation = -float("inf")
@@ -82,21 +86,29 @@ class MinimaxPlayer(Player):
                     self.states[tuple(move)] = min_evaluation
             return min_evaluation
 
-def main():
-    ttt= TicTacToe(5, 5, 4)
-    max_player = RandomPlayer(True)
-    min_player = MinimaxPlayer(False, 3, False)
-    turn = 0
-    while True:
-        current_player = max_player if turn%2 == 0 else min_player
-        row, col = current_player.make_move(ttt)
-        ttt.mark_square(row, col, current_player.value)
-        if ttt.check_win(current_player.value):
-            figure = 'X' if current_player.value ==1 else 'O'
-            print(f'{figure} won in turn nr {turn +1}')
-            break
-        turn += 1
+    def minimax2(self, game_state: TicTacToe, depth, max_player):
+        game_state = deepcopy(game_state)
+        player = 1 if max_player else -1
+        if game_state.check_win(player):
+            return 10 if player == 1 else -10
+
+        if depth == 0:
+            return 0
+
+        available_moves = game_state.empty_squares()
+        evaluations = {}
+        for move in available_moves:
+            # game_state = deepcopy(game_state)
+            row, col = move
+            player = 1 if max_player else -1
+            game_state.mark_square(row, col, player)
+            next_player = False if max_player else True
+            evaluations[game_state] = self.minimax2(game_state, depth-1, next_player)
+        if max_player:
+            return max(evaluations, key=evaluations.get)
+        else:
+            return min(evaluations, key=evaluations.get)
 
 
-if __name__ == "__main__":
-    main()
+
+
