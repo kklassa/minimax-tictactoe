@@ -37,19 +37,19 @@ class MinimaxPlayer(Player):
         super().__init__(max_player)
         self.depth = depth
         self.pruning = pruning
-        self.best_move = None
         self.states_explored = 0
         self.states = {}
         self.type = 'minimax'
 
     def make_move(self, game_state):
         self.states = {}
-        self.minimax(game_state, self.depth, self.max_player)
+        if self.pruning:
+            self.minimax_alpha_beta(game_state, self.depth, -float("inf"), float("inf"), self.max_player)
+        else:
+            self.minimax(game_state, self.depth, self.max_player)
         if self.max_player:
-            # print(self.states)
             row, column = max(self.states, key = self.states.get)
         else:
-            # print(self.states)
             row, column = min(self.states, key = self.states.get)
         return row, column
 
@@ -57,58 +57,77 @@ class MinimaxPlayer(Player):
         game_state = deepcopy(game_state)
         self.states_explored += 1
         player = 1 if max_player else -1
-        if depth == 0 or game_state.check_win(self.value):
-            return game_state.empty_squares_heuristic(self.value)
+        if game_state.check_win(player):
+            return 100 if player == 1 else -100
+
+        if depth == 0:
+            return game_state.table_heuristic()
 
 
         if max_player:
             max_evaluation = -float("inf")
             available_moves = game_state.empty_squares()
             for move in available_moves:
+                new_game_state = deepcopy(game_state)
                 row, col = move
-                player = 1 if max_player else -1
-                game_state.mark_square(row, col, player)
-                evaluation = self.minimax(game_state, depth-1, False)
+                new_game_state.mark_square(row, col, player)
+                evaluation = self.minimax(new_game_state, depth-1, False)
                 max_evaluation = max(max_evaluation, evaluation)
                 if depth == self.depth:
-                    self.states[tuple(move)] = max_evaluation
+                    self.states[tuple(move)] = evaluation
             return max_evaluation
         else:
             min_evaluation = float("inf")
             available_moves = game_state.empty_squares()
             for move in available_moves:
+                new_game_state = deepcopy(game_state)
                 row, col = move
-                player = 1 if max_player else -1
-                game_state.mark_square(row, col, player)
-                evaluation = self.minimax(game_state, depth-1, True)
+                new_game_state.mark_square(row, col, player)
+                evaluation = self.minimax(new_game_state, depth-1, True)
                 min_evaluation = min(min_evaluation, evaluation)
                 if depth == self.depth:
-                    self.states[tuple(move)] = min_evaluation
+                    self.states[tuple(move)] = evaluation
             return min_evaluation
 
-    def minimax2(self, game_state: TicTacToe, depth, max_player):
+
+    def minimax_alpha_beta(self, game_state: TicTacToe, depth, alpha, beta, max_player):
         game_state = deepcopy(game_state)
+        self.states_explored += 1
         player = 1 if max_player else -1
         if game_state.check_win(player):
-            return 10 if player == 1 else -10
+            return 100 if player == 1 else -100
 
         if depth == 0:
-            return 0
+            return game_state.table_heuristic()
 
-        available_moves = game_state.empty_squares()
-        evaluations = {}
-        for move in available_moves:
-            # game_state = deepcopy(game_state)
-            row, col = move
-            player = 1 if max_player else -1
-            game_state.mark_square(row, col, player)
-            next_player = False if max_player else True
-            evaluations[game_state] = self.minimax2(game_state, depth-1, next_player)
+
         if max_player:
-            return max(evaluations, key=evaluations.get)
+            max_evaluation = -float("inf")
+            available_moves = game_state.empty_squares()
+            for move in available_moves:
+                new_game_state = deepcopy(game_state)
+                row, col = move
+                new_game_state.mark_square(row, col, player)
+                evaluation = self.minimax_alpha_beta(new_game_state, depth-1, alpha, beta, False)
+                max_evaluation = max(max_evaluation, evaluation)
+                if depth == self.depth:
+                    self.states[tuple(move)] = evaluation
+                alpha = max(alpha, evaluation)
+                if beta <= alpha:
+                    break
+            return max_evaluation
         else:
-            return min(evaluations, key=evaluations.get)
-
-
-
-
+            min_evaluation = float("inf")
+            available_moves = game_state.empty_squares()
+            for move in available_moves:
+                new_game_state = deepcopy(game_state)
+                row, col = move
+                new_game_state.mark_square(row, col, player)
+                evaluation = self.minimax_alpha_beta(new_game_state, depth-1, alpha, beta, True)
+                min_evaluation = min(min_evaluation, evaluation)
+                if depth == self.depth:
+                    self.states[tuple(move)] = evaluation
+                beta = min(beta, evaluation)
+                if beta <= alpha:
+                    break
+            return min_evaluation

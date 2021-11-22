@@ -5,12 +5,14 @@ from time import sleep
 from tictactoe import TicTacToe
 from players import Player, HumanPlayer, RandomPlayer, MinimaxPlayer
 from user_interface import UI
+from time import time
 
 
 def game_loop(game: TicTacToe, max_player: Player, min_player: Player, ui: UI):
     turn = 0
     current_player = None
     game_over = False
+    start_time = time()
     while not game_over:
         current_player = max_player if turn%2 == 0 else min_player
         for event in pg.event.get():
@@ -40,8 +42,6 @@ def game_loop(game: TicTacToe, max_player: Player, min_player: Player, ui: UI):
             print('draw')
             game_over = True
         elif  current_player.type != 'human':
-            print(game.board)
-            print(f'current score evaluation: {game.table_heuristic()}')
             sleep(0.5)
             # print(f' Player {current_player.value} moves')
             row, col = current_player.make_move(game)
@@ -56,9 +56,10 @@ def game_loop(game: TicTacToe, max_player: Player, min_player: Player, ui: UI):
         pg.display.update()
 
         if game_over:
+            game_length = time() - start_time
             sleep(3)
 
-    return current_player, turn
+    return max_player, min_player, turn, game_length
 
 
 def main(arguments):
@@ -67,10 +68,10 @@ def main(arguments):
     parser.add_argument('--theme')
     args = parser.parse_args(arguments[1:])
 
-    rows = 3
-    columns = 3
-    streak = 3
-    square_size = 120
+    rows = 10
+    columns = 10
+    streak = 8
+    square_size = 100
     ttt= TicTacToe(rows, columns, streak)
     pg.init()
     ui = UI(rows, columns, square_size)
@@ -78,11 +79,16 @@ def main(arguments):
     ui.create_screen()
 
     #max_player = HumanPlayer(True)
-    max_player = MinimaxPlayer(True, 9, False)
-    min_player = MinimaxPlayer(False, 9, False)
+    max_player =MinimaxPlayer(True, 3 , True)
+    #max_player = MinimaxPlayer(True, 3, False)
+    min_player = RandomPlayer(False)
 
-    game_loop(ttt, max_player, min_player, ui)
-
+    max, min, turns, game_length = game_loop(ttt, max_player, min_player, ui)
+    print(f'the game took {turns} turns and {game_length} seconds to complete')
+    if max.type == 'minimax':
+        print(f'max player searched {max.states_explored}')
+    if min.type == 'minimax':
+        print(f'min player searched {min.states_explored}')
 
 if __name__=="__main__":
     main(sys.argv)
