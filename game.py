@@ -83,7 +83,7 @@ def main(arguments):
     max_player = HumanPlayer(True)
 
     if args.opponent == 'minimax':
-        min_player = MinimaxPlayer(False, 6, True)
+        min_player = MinimaxPlayer(False, 3, True)
     elif args.opponent == 'random':
         min_player = RandomPlayer(False)
     else:
@@ -99,3 +99,4 @@ def main(arguments):
 
 if __name__=="__main__":
     main(sys.argv)
+
