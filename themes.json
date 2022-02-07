@@ -23,7 +23,7 @@
             "o_color": [133, 239, 255]
         }
     ],
-    "joy": [
+    "joi": [
         {
             "foreground_color": [56, 22, 59],
             "background_color": [138, 73, 151],
@@ -37,6 +37,14 @@
             "background_color": [235, 189, 132],
             "x_color": [108, 91, 58],
             "o_color": [192, 131, 84]
+        }
+    ],
+    "2077": [
+        {
+            "foreground_color": [1, 0, 14],
+            "background_color": [251, 242, 0],
+            "x_color": [224, 9, 20],
+            "o_color": [82, 174, 217]
         }
     ]
 }

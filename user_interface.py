@@ -15,10 +15,7 @@ class UI:
         with open('themes.json') as fh:
             themes = json.load(fh)
 
-        if theme_name:
-            self.color_theme =themes[theme_name][0]
-        else:
-            self.color_theme =themes['classic'][0]
+        self.color_theme =themes[theme_name][0]
 
 
     def draw_lines(self, width, height):
